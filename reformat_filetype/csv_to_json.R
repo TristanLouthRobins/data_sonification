@@ -1,8 +1,14 @@
 library(jsonlite)
-library(dplyr)
+library(tidyverse)
 
-data <- read_csv("data.csv")
+data <- read_csv("subset.csv")
+data
 
-data_json <- toJSON(data)
+data_json <- data %>% 
+  rownames_to_column(var = 'index') %>% 
+  select(index, artist, album, track) %>% 
+  head(5) %>% 
+  nest(data = -index) %>% 
+  { setNames(.$data, .$index) }
 
-data_json
+toJSON(lapply(data_json, unbox), pretty = TRUE)
